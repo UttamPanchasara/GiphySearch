@@ -1,0 +1,35 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'kotlin-android-extensions'
+
+android {
+    compileSdkVersion 28
+    defaultConfig {
+        applicationId "com.uttampanchasara.baseprojectkotlin"
+        minSdkVersion 19
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        debug {
+            buildConfigField("String", "BASE_URL", "\"https://api.giphy.com/v1/gifs/\"")
+            buildConfigField("String", "API_KEY", "\"zHbpaxxUZae5kb6GdYOufIbHcPrUCG3G\"")
+        }
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            buildConfigField("String", "BASE_URL", "\"https://api.giphy.com/v1/gifs/\"")
+            buildConfigField("String", "API_KEY", "\"zHbpaxxUZae5kb6GdYOufIbHcPrUCG3G\"")
+        }
+    }
+}
+
+dependencies {
+    // network
+    implementation "com.amitshekhar.android:rx2-android-networking:1.0.2"
+    // conductor
+    implementation 'com.bluelinelabs:conductor-rxlifecycle2:3.0.0-rc1'
+}

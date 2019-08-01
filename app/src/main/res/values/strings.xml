@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">UttamTask</string>
+    <string name="something_wrong">Something went wrong. please try again!</string>
+</resources>
