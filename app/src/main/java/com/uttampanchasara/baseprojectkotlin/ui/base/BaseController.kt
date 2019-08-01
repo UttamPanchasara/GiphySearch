@@ -3,6 +3,7 @@ package com.uttampanchasara.baseprojectkotlin.ui.base
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import butterknife.ButterKnife
 import com.bluelinelabs.conductor.Controller
 import com.uttampanchasara.baseprojectkotlin.di.component.ActivityComponent
 
@@ -37,6 +38,7 @@ abstract class BaseController : Controller(), BaseView {
             throw RuntimeException("Invalid Layout ID")
         }
         val view = inflater.inflate(getLayoutId(), container, false)
+        ButterKnife.bind(this,view)
 
         if (activity is BaseActivity) {
             val activity = activity as BaseActivity

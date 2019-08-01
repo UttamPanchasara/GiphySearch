@@ -21,16 +21,13 @@ class HomePresenter
     }
 
     fun getGiphyVideos(query: String, offset: Int) {
-        mView?.showLoading()
         val disposable = mDataManager.getGiphyVideos(query, offset)
                 .subscribeOn(mSchedulerProvider.io())
                 .observeOn(mSchedulerProvider.ui())
                 .subscribe({
-                    mView?.hideLoading()
                     mView?.onGetVideos(it.data)
                 }, {
                     Log.e("HomePresenter", "MSG: " + (it as ANError).errorBody)
-                    mView?.hideLoading()
                     mView?.onError(R.string.something_wrong)
                 })
 
