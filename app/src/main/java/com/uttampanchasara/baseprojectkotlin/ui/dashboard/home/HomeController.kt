@@ -1,5 +1,6 @@
 package com.uttampanchasara.baseprojectkotlin.ui.dashboard.home
 
+import android.content.Intent
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
@@ -9,9 +10,11 @@ import butterknife.BindView
 import com.uttampanchasara.baseprojectkotlin.R
 import com.uttampanchasara.baseprojectkotlin.data.repository.videos.Data
 import com.uttampanchasara.baseprojectkotlin.ui.base.BaseController
+import com.uttampanchasara.baseprojectkotlin.ui.videoplayback.VideoPlaybackActivity
 import javax.inject.Inject
 
-class HomeController : BaseController(), HomeView {
+class HomeController : BaseController(), HomeView, VideosAdapter.VideoClickListener {
+
     override fun getLayoutId(): Int = R.layout.controller_home
 
     @Inject
@@ -32,7 +35,7 @@ class HomeController : BaseController(), HomeView {
         mViewFlipper.displayedChild = 0
 
         activity?.let {
-            mAdapter = VideosAdapter(it)
+            mAdapter = VideosAdapter(it, this)
             mRvVideos.layoutManager = GridLayoutManager(it, 3)
             mRvVideos.adapter = mAdapter
         }
@@ -46,5 +49,11 @@ class HomeController : BaseController(), HomeView {
         } else {
             mViewFlipper.displayedChild = 1
         }
+    }
+
+    override fun onVideoSelected(video: Data) {
+        val intent = Intent(activity, VideoPlaybackActivity::class.java)
+        intent.putExtra(VideoPlaybackActivity.DATA, video)
+        startActivity(intent)
     }
 }

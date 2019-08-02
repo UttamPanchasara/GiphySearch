@@ -8,6 +8,7 @@ import com.uttampanchasara.baseprojectkotlin.di.PerActivity
 import com.uttampanchasara.baseprojectkotlin.ui.dashboard.DashboardPresenter
 import com.uttampanchasara.baseprojectkotlin.ui.dashboard.home.HomePresenter
 import com.uttampanchasara.baseprojectkotlin.ui.splash.SplashPresenter
+import com.uttampanchasara.baseprojectkotlin.ui.videoplayback.VideoPlaybackPresenter
 import com.uttampanchasara.baseprojectkotlin.utils.rx.AppSchedulerProvider
 import com.uttampanchasara.baseprojectkotlin.utils.rx.SchedulerProvider
 import dagger.Module
@@ -52,5 +53,10 @@ class ActivityModule constructor(val mActivity: AppCompatActivity) {
     @PerActivity
     internal fun provideHomePresenter(dataManager: DataManager, schedulerProvider: SchedulerProvider, compositeDisposable: CompositeDisposable):
             HomePresenter = HomePresenter(dataManager, schedulerProvider, compositeDisposable)
+
+    @Provides
+    @PerActivity
+    internal fun provideVideoPlaybackPresenter(dataManager: DataManager, schedulerProvider: SchedulerProvider, compositeDisposable: CompositeDisposable):
+            VideoPlaybackPresenter = VideoPlaybackPresenter(dataManager, schedulerProvider, compositeDisposable)
 
 }

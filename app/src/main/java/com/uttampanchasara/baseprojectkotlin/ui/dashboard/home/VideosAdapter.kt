@@ -6,11 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.uttampanchasara.baseprojectkotlin.R
 import com.uttampanchasara.baseprojectkotlin.data.repository.videos.Data
 
-class VideosAdapter(val context: Context) : RecyclerView.Adapter<ViewHolder>() {
+class VideosAdapter(val context: Context, private val clickListener: VideoClickListener) : RecyclerView.Adapter<ViewHolder>() {
 
     private var videoList: List<Data> = emptyList()
 
@@ -25,14 +26,27 @@ class VideosAdapter(val context: Context) : RecyclerView.Adapter<ViewHolder>() {
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
         val video = videoList[position]
         Glide.with(context).load(video.images.w_still.url).into(viewHolder.mImageView)
+
+        viewHolder.txtName.text = video.title
+        viewHolder.txtDate.text = video.import_datetime
+
+        viewHolder.itemView.setOnClickListener {
+            clickListener.onVideoSelected(video)
+        }
     }
 
     fun setVideoList(data: List<Data>) {
         this.videoList = data
         notifyDataSetChanged()
     }
+
+    interface VideoClickListener {
+        fun onVideoSelected(video: Data)
+    }
 }
 
 class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-    var mImageView = itemView.findViewById<ImageView>(R.id.imageView)
+    val mImageView: ImageView = itemView.findViewById(R.id.imageView)
+    val txtName: TextView = itemView.findViewById(R.id.txtName)
+    val txtDate: TextView = itemView.findViewById(R.id.txtDate)
 }

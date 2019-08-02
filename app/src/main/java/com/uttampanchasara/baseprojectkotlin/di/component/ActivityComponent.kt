@@ -5,6 +5,7 @@ import com.uttampanchasara.baseprojectkotlin.di.module.ActivityModule
 import com.uttampanchasara.baseprojectkotlin.ui.dashboard.DashboardActivity
 import com.uttampanchasara.baseprojectkotlin.ui.dashboard.home.HomeController
 import com.uttampanchasara.baseprojectkotlin.ui.splash.SplashActivity
+import com.uttampanchasara.baseprojectkotlin.ui.videoplayback.VideoPlaybackActivity
 import dagger.Component
 
 /**
@@ -21,4 +22,6 @@ interface ActivityComponent {
     fun inject(activity: DashboardActivity)
 
     fun inject(homeController: HomeController)
+
+    fun inject(videoPlaybackActivity: VideoPlaybackActivity)
 }
