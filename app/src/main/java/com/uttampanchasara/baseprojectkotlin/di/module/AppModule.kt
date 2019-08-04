@@ -1,20 +1,24 @@
 package com.uttampanchasara.baseprojectkotlin.di.module
 
 import android.app.Application
-import android.arch.persistence.room.Room
 import android.content.Context
 import com.uttampanchasara.baseprojectkotlin.AppConstants
 import com.uttampanchasara.baseprojectkotlin.BuildConfig
-import com.uttampanchasara.baseprojectkotlin.data.*
+import com.uttampanchasara.baseprojectkotlin.data.AppDataManager
+import com.uttampanchasara.baseprojectkotlin.data.AppDbHelper
+import com.uttampanchasara.baseprojectkotlin.data.DataManager
+import com.uttampanchasara.baseprojectkotlin.data.DbHelper
 import com.uttampanchasara.baseprojectkotlin.data.network.ApiHeader
 import com.uttampanchasara.baseprojectkotlin.data.network.ApiHelper
 import com.uttampanchasara.baseprojectkotlin.data.network.AppApiHelper
 import com.uttampanchasara.baseprojectkotlin.data.prefs.AppPreferencesHelper
 import com.uttampanchasara.baseprojectkotlin.data.prefs.PreferencesHelper
+import com.uttampanchasara.baseprojectkotlin.data.repository.favvideos.MyObjectBox
 import com.uttampanchasara.baseprojectkotlin.di.ApplicationContext
 import com.uttampanchasara.baseprojectkotlin.di.PreferenceInfo
 import dagger.Module
 import dagger.Provides
+import io.objectbox.BoxStore
 import javax.inject.Singleton
 
 /**
@@ -64,10 +68,9 @@ class AppModule constructor(val mApplication: Application) {
 
     @Provides
     @Singleton
-    internal fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase =
-            Room.databaseBuilder(context, AppDatabase::class.java, AppConstants.APP_DB_NAME)
-                    .fallbackToDestructiveMigration()
-                    .build()
+    internal fun provideAppDatabase(@ApplicationContext context: Context): BoxStore {
+        return MyObjectBox.builder().androidContext(context).build()
+    }
 
     @Provides
     @Singleton

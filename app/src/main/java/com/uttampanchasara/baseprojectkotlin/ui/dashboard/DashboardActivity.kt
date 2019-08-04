@@ -1,6 +1,7 @@
 package com.uttampanchasara.baseprojectkotlin.ui.dashboard
 
 import android.os.Bundle
+import android.view.Menu
 import com.bluelinelabs.conductor.Conductor
 import com.bluelinelabs.conductor.RouterTransaction
 import com.uttampanchasara.baseprojectkotlin.R
@@ -24,9 +25,16 @@ class DashboardActivity : BaseActivity(), DashboardView {
     }
 
     override fun setUp(savedInstanceState: Bundle?) {
+        setToolbar(toolbar, getString(R.string.app_name), false)
+
         val router = Conductor.attachRouter(this, container, savedInstanceState)
         if (!router.hasRootController()) {
             router.setRoot(RouterTransaction.with(HomeController()))
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_home, menu)
+        return super.onCreateOptionsMenu(menu)
     }
 }

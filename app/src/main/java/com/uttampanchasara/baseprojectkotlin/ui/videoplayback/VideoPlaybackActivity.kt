@@ -5,7 +5,6 @@ import android.content.res.Configuration
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
 import android.support.constraint.ConstraintLayout
 import android.view.View
 import com.google.android.exoplayer2.ExoPlayerFactory
@@ -17,21 +16,27 @@ import com.google.android.exoplayer2.upstream.DataSource
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
 import com.uttampanchasara.baseprojectkotlin.R
+import com.uttampanchasara.baseprojectkotlin.data.repository.favvideos.FavoriteVideos
 import com.uttampanchasara.baseprojectkotlin.data.repository.videos.Data
 import com.uttampanchasara.baseprojectkotlin.di.component.ActivityComponent
 import com.uttampanchasara.baseprojectkotlin.ui.base.BaseActivity
 import kotlinx.android.synthetic.main.activity_video_playback.*
+import javax.inject.Inject
 
-class VideoPlaybackActivity : BaseActivity() {
+class VideoPlaybackActivity : BaseActivity(), VideoPlaybackView, View.OnClickListener {
 
     companion object {
         const val DATA = "data"
     }
 
+    @Inject
+    lateinit var mPresenter: VideoPlaybackPresenter
+
     override fun getLayout(): Int = R.layout.activity_video_playback
 
     override fun injectComponents(mActivityComponent: ActivityComponent) {
         mActivityComponent.inject(this)
+        mPresenter.onAttachView(this)
     }
 
     private lateinit var player: SimpleExoPlayer
@@ -43,27 +48,28 @@ class VideoPlaybackActivity : BaseActivity() {
     private var mIsShowingSystemUi = false
     private var mIsFullScreen = false
 
+    private var mVideoData: Data? = null
+
     override fun setUp(savedInstanceState: Bundle?) {
         setToolbar(toolbar, "", true)
 
-        val video = intent.getParcelableExtra(DATA) as Data
-        initializePlayer(video.images.original_mp4.mp4)
-
-        btnFullScreen.setOnClickListener {
-            if (!mIsFullScreen) {
-                mIsFullScreen = true
-                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-            } else {
-                mIsFullScreen = false
-                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-            }
+        mVideoData = intent.getParcelableExtra(DATA) as Data
+        mVideoData?.let { video ->
+            mPresenter.observeVotes(video.id)
+            txtName.text = video.title
+            txtDate.text = video.import_datetime
+            initializePlayer(video.images.original_mp4.mp4)
         }
+
+        btnFullScreen.setOnClickListener(this)
+        btnUpVote.setOnClickListener(this)
+        btnDownVote.setOnClickListener(this)
     }
 
     private fun initializePlayer(url: String) {
 
         trackSelector = DefaultTrackSelector(videoTrackSelectionFactory)
-        mediaDataSourceFactory = DefaultDataSourceFactory(this, Util.getUserAgent(this, "mediaPlayerSample"))
+        mediaDataSourceFactory = DefaultDataSourceFactory(this, Util.getUserAgent(this, "GiphySearch"))
 
         val mediaSource = ExtractorMediaSource.Factory(mediaDataSourceFactory)
                 .createMediaSource(Uri.parse(url))
@@ -93,61 +99,72 @@ class VideoPlaybackActivity : BaseActivity() {
         releasePlayer()
     }
 
+    override fun onClick(v: View?) {
+        when (v?.id) {
+            R.id.btnFullScreen -> {
+                if (!mIsFullScreen) {
+                    mIsFullScreen = true
+                    requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                } else {
+                    mIsFullScreen = false
+                    requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                }
+            }
+            R.id.btnDownVote -> {
+                mVideoData?.let {
+                    mPresenter.updateVotes(it.id, txtUpVote.text.toString().toInt(), txtDownVote.text.toString().toInt() + 1)
+                }
+            }
+            R.id.btnUpVote -> {
+                mVideoData?.let {
+                    mPresenter.updateVotes(it.id, txtUpVote.text.toString().toInt() + 1, txtDownVote.text.toString().toInt())
+                }
+            }
+        }
+    }
+
+    override fun onVotesUpdated() {
+        mVideoData?.let {
+            mPresenter.observeVotes(it.id)
+        }
+    }
+
+    override fun onVotesAvailable(it: List<FavoriteVideos>) {
+        txtUpVote.text = "0"
+        txtDownVote.text = "0"
+        if (it.isNotEmpty()) {
+            txtUpVote.text = it[0].upvote.toString()
+            txtDownVote.text = it[0].downVote.toString()
+        }
+    }
+
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-        handleSystemUIVisibility()
         when (newConfig.orientation) {
             Configuration.ORIENTATION_LANDSCAPE -> {
                 val lp = ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.MATCH_PARENT)
                 root.layoutParams = lp
-                Handler().postDelayed(Runnable {
-                    if (requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
-                        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-                }, 5000)
             }
             Configuration.ORIENTATION_PORTRAIT -> {
-                val lp1 = ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.MATCH_PARENT, resources.getDimension(R.dimen._200sdp).toInt())
-                root.layoutParams = lp1
-                Handler().postDelayed(Runnable {
-                    if (requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
-                        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-                }, 5000)
+                val lp = ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.MATCH_PARENT, resources.getDimension(R.dimen._200sdp).toInt())
+                root.layoutParams = lp
             }
         }
+
+        handleSystemUIVisibility()
     }
 
     private fun handleSystemUIVisibility() {
         if (mIsShowingSystemUi) {
             mIsShowingSystemUi = false
-            mIsFullScreen = true
-            showSystemUI()
+            mIsFullScreen = false
+            enableFullScreen(false)
             btnFullScreen.setImageResource(R.drawable.ic_video_small_screen)
         } else {
             mIsShowingSystemUi = true
-            mIsFullScreen = false
-            hideSystemUI()
+            mIsFullScreen = true
+            enableFullScreen(true)
             btnFullScreen.setImageResource(R.drawable.ic_video_full_screen)
         }
-    }
-
-    // This snippet hides the system bars.
-    private fun hideSystemUI() {
-        // Set the IMMERSIVE report_flag.
-        // Set the content to appear under the system bars so that the content
-        // doesn't resize when the system bars hide and show.
-        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
-                View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
-                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
-                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or // hide nav bar
-
-                View.SYSTEM_UI_FLAG_FULLSCREEN or // hide status bar
-
-                View.SYSTEM_UI_FLAG_IMMERSIVE
-    }
-
-    // This snippet shows the system bars. It does this by removing all the flags
-    // except for the ones that make the content appear under the system bars.
-    private fun showSystemUI() {
-        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
     }
 }

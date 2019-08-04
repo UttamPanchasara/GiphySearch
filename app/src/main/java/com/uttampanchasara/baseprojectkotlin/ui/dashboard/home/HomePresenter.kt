@@ -1,7 +1,5 @@
 package com.uttampanchasara.baseprojectkotlin.ui.dashboard.home
 
-import android.util.Log
-import com.androidnetworking.error.ANError
 import com.uttampanchasara.baseprojectkotlin.BasePresenter
 import com.uttampanchasara.baseprojectkotlin.R
 import com.uttampanchasara.baseprojectkotlin.data.DataManager
@@ -27,7 +25,7 @@ class HomePresenter
                 .subscribe({
                     mView?.onGetVideos(it.data)
                 }, {
-                    Log.e("HomePresenter", "MSG: " + (it as ANError).errorBody)
+                    mView?.onGetVideos(emptyList())
                     mView?.onError(R.string.something_wrong)
                 })
 

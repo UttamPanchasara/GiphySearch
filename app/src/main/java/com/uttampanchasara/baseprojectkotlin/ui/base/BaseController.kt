@@ -38,7 +38,7 @@ abstract class BaseController : Controller(), BaseView {
             throw RuntimeException("Invalid Layout ID")
         }
         val view = inflater.inflate(getLayoutId(), container, false)
-        ButterKnife.bind(this,view)
+        ButterKnife.bind(this, view)
 
         if (activity is BaseActivity) {
             val activity = activity as BaseActivity
@@ -48,6 +48,10 @@ abstract class BaseController : Controller(), BaseView {
 
         setupView(view)
         return view
+    }
+
+    fun hideKeyboard(view: View?) {
+        mActivity?.hideKeyboard(view)
     }
 
     override fun onError(error: String) {
