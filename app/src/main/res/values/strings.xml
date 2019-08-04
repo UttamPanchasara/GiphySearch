@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">UttamTask</string>
+    <string name="app_name">Giphy Videos</string>
     <string name="something_wrong">Something went wrong. please try again!</string>
     <string name="text_no_results">No results \n Please search something new!!</string>
     <string name="search">Search</string>
