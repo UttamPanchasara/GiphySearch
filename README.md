@@ -1,6 +1,8 @@
-# Android-Kotlin MVP Architecture  
-This repository contains a sample project with basic screens that implements MVVM architecture using Dagger2, Room, RxJava2, and Retrofit
+# Giphy Search
+This repository contains a demo project of Giphy Search API, with basic screens that implements MVP architecture using Dagger2, Room, RxJava2.
 
+#### Giphy Search API and Documents:
+https://developers.giphy.com/
 
 #### The app has following packages:
 1. **data**: It contains all the data accessing and manipulating components.
@@ -16,11 +18,6 @@ This repository contains a sample project with basic screens that implements MVV
 3. Retrofit: https://square.github.io/retrofit/
 4. Room: https://developer.android.com/topic/libraries/architecture/room
 
-#### Reference : This project is created from following reference project :
-https://github.com/MindorksOpenSource/android-mvp-architecture
-
-### Contributing to Android-Kotlin MVVM Architecture
-All pull requests are welcome.
 
 ### Questions?
  
@@ -30,3 +27,4 @@ All pull requests are welcome.
 <a href="https://stackoverflow.com/users/5719935/uttam-panchasara">
 <img src="https://stackoverflow.com/users/flair/5719935.png" width="208" height="58" alt="profile for Uttam Panchasara at Stack Overflow, Q&amp;A for professional and enthusiast programmers" title="profile for Uttam Panchasara at Stack Overflow, Q&amp;A for professional and enthusiast programmers">
 </a>
+https://developers.giphy.com/
